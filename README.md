@@ -13,35 +13,28 @@ Unofficial Sentry MCP that provide unavailable tools on the official MCP.
 | `get_release_regressed_issues` | Issues that regressed in a specific release |
 | `get_release_deploys` | Deployment history for a release |
 
-## Setup
-
-1. Install dependencies:
-```bash
-pip install -e .
-```
-
-2. Copy `.env.example` to `.env` and fill in your values:
-```bash
-cp .env.example .env
-```
-
-```env
-SENTRY_PERSONAL_TOKEN=your_sentry_personal_token
-SENTRY_ORG=your-org-slug
-SENTRY_PROJECT=your-project-id
-SENTRY_BASE_URL=https://us.sentry.io
-```
-
 ## Claude Code Integration
 
-Add to your `.mcp.json`:
+Run once to register the server:
+
+```bash
+claude mcp add sentry-companion \
+  -e SENTRY_PERSONAL_TOKEN=your_token \
+  -e SENTRY_ORG=your-org-slug \
+  -e SENTRY_PROJECT=your-project-id \
+  -e SENTRY_BASE_URL=https://us.sentry.io \
+  -- uvx sentry-companion-mcp
+```
+
+Or add manually to your `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "sentry-companion": {
-      "command": "python",
-      "args": ["-m", "sentry_companion_mcp.server"],
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["sentry-companion-mcp"],
       "env": {
         "SENTRY_PERSONAL_TOKEN": "your_token",
         "SENTRY_ORG": "your-org-slug",
