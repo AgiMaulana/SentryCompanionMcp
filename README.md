@@ -13,9 +13,10 @@ Unofficial Sentry MCP that provide unavailable tools on the official MCP.
 | `get_release_regressed_issues` | Issues that regressed in a specific release |
 | `get_release_deploys` | Deployment history for a release |
 
-## Claude Code Integration
+## Installation
 
-Run once to register the server:
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if you haven't already.
+2. Run once to register with Claude Code:
 
 ```bash
 claude mcp add sentry-companion \
