@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "sentry-companion-mcp"
+version = "0.1.0"
+description = "Companion MCP server for Sentry — release health, adoption metrics, and tools missing from the official Sentry MCP"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp[cli]>=1.0.0",
+]
+
+[project.scripts]
+sentry-companion-mcp = "sentry_companion_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/sentry_companion_mcp"]
