@@ -24,3 +24,19 @@ def sentry_get(path: str, token: str, base_url: str) -> dict | list:
     req = urllib.request.Request(url, headers={"Authorization": f"Bearer {token}"})
     with urllib.request.urlopen(req) as resp:
         return json.loads(resp.read())
+
+
+def sentry_post(path: str, data: dict, token: str, base_url: str) -> dict:
+    url = f"{base_url}{path}"
+    body = json.dumps(data).encode()
+    req = urllib.request.Request(
+        url,
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json",
+        },
+    )
+    with urllib.request.urlopen(req) as resp:
+        return json.loads(resp.read())
