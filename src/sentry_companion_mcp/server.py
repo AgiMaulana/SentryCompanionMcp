@@ -2,6 +2,7 @@ from mcp.server.fastmcp import FastMCP
 from .tools.release_health import get_release_health, get_release_adoption, compare_releases
 from .tools.issues import get_release_new_issues, get_release_regressed_issues
 from .tools.deploys import get_release_deploys
+from .tools.comments import add_issue_comment
 
 mcp = FastMCP(
     "sentry-companion",
@@ -12,7 +13,8 @@ mcp = FastMCP(
         "- compare_releases → side-by-side health comparison between two releases\n"
         "- get_release_new_issues → issues first seen in a release\n"
         "- get_release_regressed_issues → issues that regressed in a release\n"
-        "- get_release_deploys → deployment history for a release"
+        "- get_release_deploys → deployment history for a release\n"
+        "- add_issue_comment → post a comment on a Sentry issue"
     ),
 )
 
@@ -22,6 +24,7 @@ mcp.tool()(compare_releases)
 mcp.tool()(get_release_new_issues)
 mcp.tool()(get_release_regressed_issues)
 mcp.tool()(get_release_deploys)
+mcp.tool()(add_issue_comment)
 
 
 def main():

@@ -12,6 +12,7 @@ Unofficial Sentry MCP that provide unavailable tools on the official MCP.
 | `get_release_new_issues` | Issues first seen in a specific release |
 | `get_release_regressed_issues` | Issues that regressed in a specific release |
 | `get_release_deploys` | Deployment history for a release |
+| `add_issue_comment` | Post a comment on a Sentry issue |
 
 ## Installation
 
