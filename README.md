@@ -1,5 +1,8 @@
 # sentry-companion-mcp
 
+[![MCP Badge](https://lobehub.com/badge/mcp/agimaulana-sentrycompanionmcp)](https://lobehub.com/mcp/agimaulana-sentrycompanionmcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Unofficial Sentry MCP that provide unavailable tools on the official MCP.
 
 ## Tools
