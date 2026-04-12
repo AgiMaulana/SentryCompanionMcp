@@ -40,43 +40,82 @@ def get_release_new_issues(version: str, limit: int = 25) -> str:
     return "\n".join(lines).strip()
 
 
-def get_event_user_geo(issue_id: str, organization_slug: str = None, event_id: str = "latest") -> str:
+def get_issue_users(
+    issue_id: str,
+    organization_slug: str = None,
+    limit: int = 100,
+    deduplicate_by: str = "email",
+    fields: list = None,
+) -> str:
     """
-    Get the geo information for a user in a specific Sentry event.
+    List users affected by a Sentry issue across all events (deduplicated).
     Fills the gap left by the official Sentry MCP which only returns hashed user IDs.
 
     Args:
         issue_id: The Sentry issue ID (e.g. "GOOD-DOCTOR-ANDROID-6XV")
         organization_slug: Organization slug (defaults to configured org)
-        event_id: Event ID to fetch, defaults to "latest"
+        limit: Max events to scan (default: 100)
+        deduplicate_by: Field to deduplicate on — "email", "id", or "ip_address" (default: "email")
+        fields: List of user fields to include. Options: id, email, username, ip_address, name, geo.
+                Default: all available fields.
     """
     cfg = get_config()
     org = organization_slug or cfg["org"]
-    path = f"/api/0/organizations/{org}/issues/{issue_id}/events/{event_id}/"
+    path = f"/api/0/organizations/{org}/issues/{issue_id}/events/?limit={limit}"
 
-    event = sentry_get(path, cfg["token"], cfg["base_url"])
+    events = sentry_get(path, cfg["token"], cfg["base_url"])
 
-    user = event.get("user", {})
-    geo = user.get("geo")
+    if not events:
+        return f"No events found for issue '{issue_id}'."
 
-    if not geo:
-        return (
-            f"No geo information found for issue '{issue_id}' (event: {event_id}).\n"
-            f"User ID: {user.get('id', 'N/A')}"
-        )
+    # Collect all users from events
+    all_users = []
+    for event in events:
+        user = event.get("user", {})
+        if user:
+            all_users.append(user)
+
+    if not all_users:
+        return f"No user information found in {len(events)} events for issue '{issue_id}'."
+
+    # Deduplicate
+    seen = set()
+    unique_users = []
+    for user in all_users:
+        key = user.get(deduplicate_by)
+        if key is not None:
+            if key not in seen:
+                seen.add(key)
+                unique_users.append(user)
+        else:
+            # Include users with null dedup key as a single entry
+            if None not in seen:
+                seen.add(None)
+                unique_users.append(user)
+
+    # Filter fields
+    all_field_options = ["id", "email", "username", "ip_address", "name", "geo"]
+    selected_fields = fields if fields else all_field_options
+
+    filtered_users = []
+    for user in unique_users:
+        filtered = {}
+        for field in selected_fields:
+            if field in user and user[field] is not None:
+                filtered[field] = user[field]
+        if filtered:
+            filtered_users.append(filtered)
+
+    if not filtered_users:
+        return f"No matching user data found for issue '{issue_id}'."
 
     result = {
         "issue_id": issue_id,
-        "event": event_id,
-        "user_geo": {
-            "country_code": geo.get("country_code"),
-            "city": geo.get("city"),
-            "region": geo.get("region"),
-        },
+        "total_events_scanned": len(events),
+        "unique_users": len(filtered_users),
+        "deduplicated_by": deduplicate_by,
+        "users": filtered_users,
     }
-
-    # Remove None values
-    result["user_geo"] = {k: v for k, v in result["user_geo"].items() if v is not None}
 
     return json.dumps(result, indent=2)
 
