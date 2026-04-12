@@ -7,7 +7,13 @@
       "Bash(rm *)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(git pull *)",
+      "Bash(git stash)",
+      "Bash(git stash *)",
+      "Bash(git checkout *)",
+      "Bash(gh *)",
+      "Bash(git config *)"
     ]
   },
   "$version": 3
