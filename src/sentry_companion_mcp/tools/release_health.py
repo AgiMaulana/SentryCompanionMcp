@@ -18,7 +18,8 @@ def _fetch_health(version_fragment: str, days: int) -> list[dict]:
         cfg["base_url"],
     )
     return [
-        g for g in data.get("groups", [])
+        g
+        for g in data.get("groups", [])
         if version_fragment in g.get("by", {}).get("release", "")
     ]
 
@@ -96,8 +97,12 @@ def get_release_adoption(version: str, days: int = 3) -> str:
         user_adoption = (users / total_users * 100) if total_users else 0.0
 
         lines.append(f"Release: {release}")
-        lines.append(f"  Session adoption : {session_adoption:.2f}%  ({sessions:,} / {total_sessions:,})")
-        lines.append(f"  User adoption    : {user_adoption:.2f}%  ({users:,} / {total_users:,})")
+        lines.append(
+            f"  Session adoption : {session_adoption:.2f}%  ({sessions:,} / {total_sessions:,})"
+        )
+        lines.append(
+            f"  User adoption    : {user_adoption:.2f}%  ({users:,} / {total_users:,})"
+        )
         lines.append("")
 
     return "\n".join(lines).strip()

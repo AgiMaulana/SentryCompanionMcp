@@ -1,4 +1,3 @@
-import json
 import urllib.parse
 from ..client import get_config, sentry_get
 
@@ -24,20 +23,19 @@ def get_release_new_issues(version: str, limit: int = 25) -> str:
     if not issues:
         return f"No new issues found for release '{version}'."
 
-    lines = [f"New issues in {version} (up to {limit}):"]
-    for issue in issues:
-        title = issue.get("title", "Unknown")
-        issue_id = issue.get("id", "")
-        count = issue.get("count", 0)
-        culprit = issue.get("culprit", "")
-        url = f"{cfg['base_url']}/organizations/{cfg['org']}/issues/{issue_id}/"
-        lines.append(f"  [{issue_id}] {title}")
-        lines.append(f"    Culprit : {culprit}")
-        lines.append(f"    Events  : {count}")
-        lines.append(f"    URL     : {url}")
-        lines.append("")
-
-    return "\n".join(lines).strip()
+    return f"New issues in {version} (up to {limit}):\n" + "\n".join(
+        f"  [{issue_id}] {title}\n    Culprit : {culprit}\n    Events  : {count}\n    URL     : {url}"
+        for issue in issues
+        for title, issue_id, count, culprit, url in [
+            (
+                issue.get("title", "Unknown"),
+                issue.get("id", ""),
+                issue.get("count", 0),
+                issue.get("culprit", ""),
+                f"{cfg['base_url']}/organizations/{cfg['org']}/issues/{issue.get('id', '')}/",
+            )
+        ]
+    )
 
 
 def get_issue_users(
@@ -46,7 +44,7 @@ def get_issue_users(
     limit: int = 100,
     deduplicate_by: str = "email",
     fields: list = None,
-) -> str:
+) -> dict:
     """
     List users affected by a Sentry issue across all events (deduplicated).
     Fills the gap left by the official Sentry MCP which only returns hashed user IDs.
@@ -76,7 +74,9 @@ def get_issue_users(
             all_users.append(user)
 
     if not all_users:
-        return f"No user information found in {len(events)} events for issue '{issue_id}'."
+        return (
+            f"No user information found in {len(events)} events for issue '{issue_id}'."
+        )
 
     # Deduplicate
     seen = set()
@@ -117,7 +117,7 @@ def get_issue_users(
         "users": filtered_users,
     }
 
-    return json.dumps(result, indent=2)
+    return result
 
 
 def get_release_regressed_issues(version: str, limit: int = 25) -> str:

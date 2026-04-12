@@ -2,7 +2,7 @@ import urllib.parse
 from ..client import get_config, sentry_get, sentry_post
 
 
-def add_issue_comment(issue_id: str, text: str) -> str:
+def add_issue_comment(issue_id: str, text: str) -> dict:
     """
     Post a comment on a Sentry issue.
     Fills the gap in both the official Sentry MCP and this companion — neither
@@ -25,7 +25,7 @@ def add_issue_comment(issue_id: str, text: str) -> str:
         cfg["base_url"],
     )
     comment_id = result.get("id", "")
-    return f"Comment posted (id={comment_id}) on issue {issue_id}."
+    return {"comment_id": comment_id, "issue_id": issue_id, "success": True}
 
 
 def _resolve_issue_id(cfg: dict, issue_id: str) -> str:

@@ -1,6 +1,27 @@
+import json as _json
+
+_original_dumps = _json.dumps
+
+
+def _compact_dumps(obj, **kwargs):
+    kwargs["separators"] = (",", ":")
+    kwargs.pop("indent", None)
+    return _original_dumps(obj, **kwargs)
+
+
+_json.dumps = _compact_dumps
+
 from mcp.server.fastmcp import FastMCP
-from .tools.release_health import get_release_health, get_release_adoption, compare_releases
-from .tools.issues import get_release_new_issues, get_release_regressed_issues, get_issue_users
+from .tools.release_health import (
+    get_release_health,
+    get_release_adoption,
+    compare_releases,
+)
+from .tools.issues import (
+    get_release_new_issues,
+    get_release_regressed_issues,
+    get_issue_users,
+)
 from .tools.deploys import get_release_deploys
 from .tools.comments import add_issue_comment
 
